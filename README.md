@@ -2,7 +2,7 @@
 
 Here is the plan: A floating input shows up, you a enter a command and you're done. You can use `<Tab>` completion like the regular `cmdline`, and can also navigate the command history with `<Up>` and `<Down>` arrows. That's it.
 
-My hope is that someone else with more knowledge sees this and tries to make a [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin with the same features.
+My hope is that someone else with more knowledge sees this and inspires them to make a [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin with the same features.
 
 ![A floating input with the text 'Telescope co'. ](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
 
@@ -121,7 +121,7 @@ If you need something more complex you can use a function.
 ```lua
 set_keymaps = function(imap, feedkeys)
   imap('<M-s>', function()
-    if vim.fn.pumvisible == 0 then
+    if vim.fn.pumvisible() == 0 then
       feedkeys('%s///gc<Left><Left><Left><Left>')
     end
   end)
