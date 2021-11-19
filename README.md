@@ -4,6 +4,8 @@ Here is the plan: A floating input shows up, you a enter a command and you're do
 
 My hope is that someone else with more knowledge sees this and tries to make a [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin with the same features.
 
+![A floating input with the text 'Telescope co'. ](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
+
 ## Getting Started
 
 Make sure you have [Neovim v0.5.1](https://github.com/neovim/neovim/releases/tag/v0.5.1) or greater.
