@@ -8,7 +8,7 @@ My hope is that someone else with more knowledge sees this and tries to make a [
 
 Make sure you have [Neovim v0.5.1](https://github.com/neovim/neovim/releases/tag/v0.5.1) or greater.
 
-### Dependecies
+### Dependencies
 
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim)
 
