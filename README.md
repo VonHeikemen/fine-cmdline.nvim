@@ -54,7 +54,7 @@ vim.api.nvim_set_keymap(
 Or use vimscript.
 
 ```vim
-nnoremap <C-p> :lua require('fine-cmdline').open()
+nnoremap <C-p> :lua require('fine-cmdline').open()<CR>
 ```
 
 ### Configuration
