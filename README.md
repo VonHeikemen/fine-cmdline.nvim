@@ -65,6 +65,9 @@ This are the defaults.
 
 ```lua
 require('fine-cmdline').setup({
+  cmdline = {
+    enable_keymaps = true
+  },
   popup = {
     position = {
       row = '10%',
@@ -168,6 +171,38 @@ set_keymaps = function(imap, feedkeys)
   imap('<M-k>', fn.up_history)
   imap('<M-j>', fn.down_history)
 end
+```
+
+### Integration with completion engines
+
+Default keybindings can get in the way of common conventions for completion engines. To work around this there is a way to disable all default keybindings.
+
+```lua
+cmdline = {
+  enable_keymaps = false
+}
+```
+
+But not all defaults are bad, you can add the ones you like. Here is a complete example.
+
+```lua
+local fineline = require('fine-cmdline')
+local fn = fineline.fn
+
+fineline.setup({
+  cmdline = {
+    enable_keymaps = false
+  },
+  hooks = {
+    set_keymaps = function(imap, feedkeys)
+      imap('<Esc>', fn.close)
+      imap('<C-c>', fn.close)
+
+      imap('<Up>', fn.up_history)
+      imap('<Down>', fn.down_history)
+    end
+  }
+})
 ```
 
 ## Caveats
