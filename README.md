@@ -50,6 +50,7 @@ if you'd like to remap `:` instead
 vim.api.nvim_set_keymap( 'n', ':', ':lua require("fine-cmdline").open()<CR>', {noremap = true})
 ```
 
+
 * **Vimscript Bindings**
 
 ```vim
