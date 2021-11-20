@@ -50,11 +50,24 @@ vim.api.nvim_set_keymap(
   {noremap = true}
 )
 ```
+Or more convenient, remap `:` 
+```lua
+vim.api.nvim_set_keymap(
+  'n',
+  ':',
+  ':lua require("fine-cmdline").open()<CR>',
+  {noremap = true}
+)
+```
 
-Or use vimscript.
+In vimscript.
 
 ```vim
 nnoremap <C-p> :lua require('fine-cmdline').open()<CR>
+```
+if you'd like to remap `:` instead
+```vim
+nnoremap : :lua require('fine-cmdline').open()<CR>
 ```
 
 ### Configuration
