@@ -7,10 +7,14 @@ local event = require('nui.utils.autocmd').event
 local state = {
   history = nil,
   idx_hist = 0,
-  hooks = {}
+  hooks = {},
+  cmdline = {}
 }
 
 local defaults = {
+  cmdline = {
+    enable_keymaps = true
+  },
   popup = {
     position = {
       row = '10%',
@@ -41,6 +45,7 @@ M.setup = function(config)
 
   local popup_options = fn.merge(defaults.popup, config.popup)
   state.hooks = fn.merge(defaults.hooks, config.hooks)
+  state.cmdline = fn.merge(defaults.cmdline, config.cmdline)
 
   M.input = Input(popup_options, {
     prompt = ': ',
@@ -62,7 +67,10 @@ M.open = function()
   state.hooks.before_mount(M.input)
 
   M.input:mount()
-  fn.keymaps()
+
+  if state.cmdline.enable_keymaps then
+    fn.keymaps()
+  end
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
