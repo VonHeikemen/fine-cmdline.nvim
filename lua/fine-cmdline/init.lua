@@ -170,7 +170,7 @@ fn.map = function(lhs, rhs)
     rhs = function() fn.feedkeys(keys) end
   end
 
-  M.input:map('i', lhs, rhs, {noremap = true})
+  M.input:map('i', lhs, rhs, {noremap = true}, true)
 end
 
 fn.feedkeys = function(keys)
