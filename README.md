@@ -51,7 +51,7 @@ vim.api.nvim_set_keymap(
 )
 ```
 
-if you'd like to remap `:` instead
+If you'd like to remap `:` instead.
 
 ```lua
 vim.api.nvim_set_keymap(
@@ -68,7 +68,7 @@ vim.api.nvim_set_keymap(
 nnoremap <C-p> <cmd>lua require('fine-cmdline').open()<CR>
 ```
 
-if you'd like to remap `:` instead
+If you'd like to remap `:` instead.
 
 ```vim
 nnoremap : <cmd>lua require('fine-cmdline').open()<CR>
@@ -225,6 +225,8 @@ fineline.setup({
 ## Caveats
 
 This is not a special mode. It's just a normal buffer, incremental search will not work here.
+
+There is a known issue with [cmdwin](https://neovim.io/doc/user/cmdline.html#cmdwin) (the thing that shows up when you press `q:` by accident). `cmdwin` and `fine-cmdline` have the same goal, execute ex-commands. Problem is `cmdwin` will be the one executing the command, and you will bump into some weird behavior. If for some reason you're in `cmdwin` and call `fine-cmdline`, press `<C-c>` twice (one to close the input, one to close `cmdwin`). Don't try anything else. Just close both.
 
 ## Contributing
 
