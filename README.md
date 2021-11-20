@@ -102,6 +102,19 @@ require('fine-cmdline').setup({
 
 `before_mount` and `after_mount` recieve the instance of the input, so you can do anything with it.
 
+A good use case for this would be to change the prompt (do it at your own risk).
+
+```lua
+require('fine-cmdline').setup({
+  hooks = {
+    before_mount = function(input)
+      -- Beware, the prompt can mess around with the completion
+      input.input_props.prompt = ':'
+    end
+  }
+})
+```
+
 `set_keymaps`. Why is this even in a "hook"? Funny story, you can only map keys after the input is mounted. And there are other not so funny quirks. So I thought I could make things easier for you.
 
 ### Setting keymaps
