@@ -43,21 +43,35 @@ You just need to require this plugin and call `.open()`... in a keybinding.
 * **Lua Bindings**
 
 ```lua
-vim.api.nvim_set_keymap( 'n', '<C-p>', ':lua require("fine-cmdline").open()<CR>', {noremap = true})
+vim.api.nvim_set_keymap(
+  'n',
+  '<C-p>',
+  '<cmd>lua require("fine-cmdline").open()<CR>',
+  {noremap = true}
+)
 ```
+
 if you'd like to remap `:` instead
+
 ```lua
-vim.api.nvim_set_keymap( 'n', ':', ':lua require("fine-cmdline").open()<CR>', {noremap = true})
+vim.api.nvim_set_keymap(
+  'n',
+  ':',
+  '<cmd>lua require("fine-cmdline").open()<CR>',
+  {noremap = true}
+)
 ```
 
 * **Vimscript Bindings**
 
 ```vim
-nnoremap <C-p> :lua require('fine-cmdline').open()<CR>
+nnoremap <C-p> <cmd>lua require('fine-cmdline').open()<CR>
 ```
+
 if you'd like to remap `:` instead
+
 ```vim
-nnoremap : :lua require('fine-cmdline').open()<CR>
+nnoremap : <cmd>lua require('fine-cmdline').open()<CR>
 ```
 
 ### Configuration
