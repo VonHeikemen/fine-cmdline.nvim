@@ -40,14 +40,27 @@ local defaults = {
   }
 }
 
+local popup_options = {}
+
 M.input = nil
+
 M.setup = function(config)
   config = config or {}
   state.user_opts = config
 
-  local popup_options = fn.merge(defaults.popup, config.popup)
+  popup_options = fn.merge(defaults.popup, config.popup)
+
   state.hooks = fn.merge(defaults.hooks, config.hooks)
   state.cmdline = fn.merge(defaults.cmdline, config.cmdline)
+
+end
+
+M.open = function()
+  if not M.input or not vim.api.nvim_buf_is_valid(M.input.bufnr) then
+    M.setup(state.user_opts)
+  end
+
+  state.hooks.before_mount(M.input)
 
   M.input = Input(popup_options, {
     prompt = ': ',
@@ -61,14 +74,6 @@ M.setup = function(config)
       fn.reset_history()
     end,
   })
-end
-
-M.open = function()
-  if not M.input or not vim.api.nvim_buf_is_valid(M.input.bufnr) then
-    M.setup(state.user_opts)
-  end
-
-  state.hooks.before_mount(M.input)
 
   M.input:mount()
 
