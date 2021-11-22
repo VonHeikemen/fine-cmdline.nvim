@@ -211,7 +211,14 @@ fineline.setup({
     enable_keymaps = false
   },
   hooks = {
+    before_mount = function(input)
+      -- Prompt can influence the completion engine.
+      -- This is your chance to change it to something that works for you
+      input.input_props.prompt = ': '
+    end,
     set_keymaps = function(imap, feedkeys)
+      -- Restore default keybindings...
+      -- Except for `<Tab>`, that's what everyone uses to autocomplete
       imap('<Esc>', fn.close)
       imap('<C-c>', fn.close)
 
@@ -241,3 +248,4 @@ If you want to improve the ui it will be better if you contribute to [nui.nvim](
 If you find this tool useful and want to support my efforts, [buy me a coffee ☕](https://www.buymeacoffee.com/vonheikemen).
 
 [![buy me a coffee](https://res.cloudinary.com/vonheikemen/image/upload/v1618466522/buy-me-coffee_ah0uzh.png)](https://www.buymeacoffee.com/vonheikemen)
+
