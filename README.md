@@ -6,6 +6,8 @@ My hope is that someone else with more knowledge sees this and inspires them to 
 
 ![A floating input with the text 'Telescope co'. ](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
 
+> Do note `/`, '?' and `%s` will not highlight the matches in realtime the matches as you type. That's [another plugin](https://github.com/VonHeikemen/searchbox.nvim).
+
 ## Getting Started
 
 Make sure you have [Neovim v0.5.1](https://github.com/neovim/neovim/releases/tag/v0.5.1) or greater.
