@@ -64,10 +64,7 @@ M.setup = function(config)
 end
 
 M.open = function()
-  if not M.input or not vim.api.nvim_buf_is_valid(M.input.bufnr) then
-    M.setup(state.user_opts)
-  end
-
+  M.setup(state.user_opts)
   state.hooks.before_mount(M.input)
 
   M.input:mount()
@@ -194,4 +191,3 @@ fn.feedkeys = function(keys)
 end
 
 return M
-
