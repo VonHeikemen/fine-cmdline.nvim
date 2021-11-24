@@ -85,7 +85,8 @@ This are the defaults.
 ```lua
 require('fine-cmdline').setup({
   cmdline = {
-    enable_keymaps = true
+    enable_keymaps = true,
+    smart_history = false
   },
   popup = {
     position = {
@@ -117,6 +118,10 @@ require('fine-cmdline').setup({
   }
 })
 ```
+
+- `cmdline.enable_keymaps` tells `fine-cmdline` that is okay to map the recommended default keybindings. If you set to `false` you will need to do map yourself the keys in the `set_keymaps` hook.
+
+- `cmdline.smart_history` tells `fine-cmdline` to use the user input as search term, then when you navigate the history only the entries that begin with term will show up. Imagine `PackerSync` is in your command history, just enter the string `Pack` and press `<Up>` to start looking for it.
 
 - `popup` is passed directly to `nui.popup`. You can check the valid keys in their documentation: [popup.options](https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup#options)
 
@@ -181,14 +186,18 @@ local fn = require('fine-cmdline').fn
 
 - `fn.down_history`: Replaces the text in the input with the next entry in the command history.
 
-If you wanted to navigate command history with `Alt + k` and `Alt + j`.
+- `fn.up_search_history`: Take the user input, start a search and show the previous entry that start with that prefix.
+
+- `fn.down_search_history`: Take the user input, start a search and show the next entry that start with that prefix.
+
+If you wanted to enable the "smart history" with `Alt + k` and `Alt + j`.
 
 ```lua
 set_keymaps = function(imap, feedkeys)
   local fn = require('fine-cmdline').fn
 
-  imap('<M-k>', fn.up_history)
-  imap('<M-j>', fn.down_history)
+  imap('<M-k>', fn.up_search_history)
+  imap('<M-j>', fn.down_search_history)
 end
 ```
 

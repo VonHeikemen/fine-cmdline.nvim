@@ -5,6 +5,7 @@ local Input = require('nui.input')
 local event = require('nui.utils.autocmd').event
 
 local state = {
+  query = '',
   history = nil,
   idx_hist = 0,
   hooks = {},
@@ -14,7 +15,8 @@ local state = {
 
 local defaults = {
   cmdline = {
-    enable_keymaps = true
+    enable_keymaps = true,
+    smart_history = false
   },
   popup = {
     position = {
@@ -60,6 +62,7 @@ M.setup = function(config)
     on_close = function()
       fn.reset_history()
     end,
+    on_change = fn.on_change()
   })
 end
 
@@ -77,14 +80,34 @@ M.open = function()
   state.hooks.after_mount(M.input)
 end
 
+fn.on_change = function()
+  local prev_hist_idx = 0
+  return function(value)
+    if value == '' then return end
+
+    if prev_hist_idx == state.idx_hist then
+      state.query = value
+      return
+    end
+
+    prev_hist_idx = state.idx_hist
+  end
+end
+
 fn.keymaps = function()
   fn.map('<Esc>', M.fn.close)
   fn.map('<C-c>', M.fn.close)
+
   fn.map('<Tab>', M.fn.complete_or_next_item)
   fn.map('<S-Tab>', M.fn.previous_item)
 
-  fn.map('<Up>', M.fn.up_history)
-  fn.map('<Down>', M.fn.down_history)
+  if state.cmdline.smart_history then
+    fn.map('<Up>', M.fn.up_search_history)
+    fn.map('<Down>', M.fn.down_search_history)
+  else
+    fn.map('<Up>', M.fn.up_history)
+    fn.map('<Down>', M.fn.down_history)
+  end
 end
 
 M.fn.close = function()
@@ -95,9 +118,62 @@ M.fn.close = function()
   end
 end
 
+M.fn.up_search_history = function()
+  local prompt = M.input.input_props.prompt:len()
+  local line = vim.fn.getline('.')
+  local user_input = line:sub(prompt + 1, vim.fn.col('.'))
+  local prev_cmd = state.history and state.history[state.idx_hist]
+
+  if (line:len() == prompt) then
+    M.fn.up_history()
+    return
+  end
+
+  fn.cmd_history()
+  local idx = state.idx_hist == 0 and 1 or (state.idx_hist + 1)
+
+  while(state.history[idx]) do
+    local cmd = state.history[idx]
+
+    if vim.startswith(cmd, state.query) then
+      state.idx_hist = idx
+      fn.replace_line(cmd)
+      return
+    end
+
+    idx = idx + 1
+  end
+end
+
+M.fn.down_search_history = function()
+  local prompt = M.input.input_props.prompt:len()
+  local line = vim.fn.getline('.')
+  local user_input = line:sub(prompt + 1, vim.fn.col('.'))
+  local prev_cmd = state.history and state.history[state.idx_hist]
+
+  if (line:len() == prompt) then
+    M.fn.down_history()
+    return
+  end
+
+  fn.cmd_history()
+  local idx = state.idx_hist == 0 and #state.history or (state.idx_hist - 1)
+
+  while(state.history[idx]) do
+    local cmd = state.history[idx]
+
+    if vim.startswith(cmd, state.query) then
+      state.idx_hist = idx
+      fn.replace_line(cmd)
+      return
+    end
+
+    idx = idx - 1
+  end
+end
+
 M.fn.up_history = function()
   fn.cmd_history()
-  vim.cmd('normal Vd')
   state.idx_hist = state.idx_hist + 1
   local cmd = state.history[state.idx_hist]
 
@@ -106,12 +182,11 @@ M.fn.up_history = function()
     return
   end
 
-  fn.feedkeys(cmd)
+  fn.replace_line(cmd)
 end
 
 M.fn.down_history = function()
   fn.cmd_history()
-  vim.cmd('normal Vd')
   state.idx_hist = state.idx_hist - 1
   local cmd = state.history[state.idx_hist]
 
@@ -120,7 +195,7 @@ M.fn.down_history = function()
     return
   end
 
-  fn.feedkeys(cmd)
+  fn.replace_line(cmd)
 end
 
 M.fn.complete_or_next_item = function()
@@ -143,6 +218,22 @@ M.fn.previous_item = function()
   end
 end
 
+fn.replace_line = function(cmd)
+  vim.cmd('normal Vc')
+  vim.api.nvim_buf_set_lines(
+    M.input.bufnr,
+    vim.fn.line('.') - 1,
+    vim.fn.line('.'),
+    true,
+    {M.input.input_props.prompt ..  cmd}
+  )
+
+  vim.api.nvim_win_set_cursor(
+    M.input.winid,
+    {vim.fn.line('$'), vim.fn.getline('.'):len()}
+  )
+end
+
 fn.cmd_history = function()
   if state.history then return end
 
@@ -162,6 +253,7 @@ end
 fn.reset_history = function()
   state.idx_hist = 0
   state.history = nil
+  state.query = ''
 end
 
 fn.merge = function(defaults, override)
@@ -191,3 +283,4 @@ fn.feedkeys = function(keys)
 end
 
 return M
+
