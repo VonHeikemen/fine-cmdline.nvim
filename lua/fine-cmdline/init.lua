@@ -76,6 +76,10 @@ M.open = function()
     fn.keymaps()
   end
 
+  fn.map('<BS>', function()
+    fn.prompt_backspace(M.input.input_props.prompt:len())
+  end)
+
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
 end
@@ -280,6 +284,20 @@ fn.feedkeys = function(keys)
     'i',
     true
   )
+end
+
+-- Default backspace has inconsistent behavior, have to make our own (for now)
+-- Taken from here:
+-- https://github.com/neovim/neovim/issues/14116#issuecomment-976069244
+fn.prompt_backspace = function(prompt)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line = cursor[1]
+  local col = cursor[2]
+
+  if col ~= prompt then
+    vim.api.nvim_buf_set_text(0, line - 1, col - 1, line - 1, col, {''})
+    vim.api.nvim_win_set_cursor(0, {line, col - 1})
+  end
 end
 
 return M
