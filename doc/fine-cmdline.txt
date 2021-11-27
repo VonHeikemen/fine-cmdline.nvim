@@ -1,0 +1,318 @@
+==============================================================================
+*fine-cmdline*
+
+Enter ex-commands in a nice floating input.
+
+==============================================================================
+Introduction                                              *fine-cmdline-intro*
+
+Here is the plan: A floating input shows up, you a enter a command and you're
+done. You can use `<Tab>` completion like the regular `cmdline`, and can also
+navigate the command history with `<Up>` and `<Down>` arrows. That's it.
+
+==============================================================================
+Quick Start                                          *fine-cmdline-quickstart*
+
+You just need to require this plugin and call `.open()`... in a keybinding.
+
+Lua bindings:
+
+>
+  vim.api.nvim_set_keymap(
+    'n',
+    '<C-p>',
+    '<cmd>lua require("fine-cmdline").open()<CR>',
+    {noremap = true}
+  )
+<
+
+If you'd like to remap `:` instead.
+
+>
+  vim.api.nvim_set_keymap(
+    'n',
+    ':',
+    '<cmd>lua require("fine-cmdline").open()<CR>',
+    {noremap = true}
+  )
+<
+
+Vimscript bindings:
+
+>
+  nnoremap <C-p> <cmd>lua require('fine-cmdline').open()<CR>
+<
+
+If you'd like to remap `:` instead.
+
+>
+  nnoremap : <cmd>lua require('fine-cmdline').open()<CR>
+<
+==============================================================================
+Configuration                                      *fine-cmdline-configuration*
+                                                          *fine-cmdline.setup*
+
+If you want to change anything from the `ui` or add a "hook" you can use
+the function `.setup()`.
+
+Here is an example showing all the default values.
+
+>
+  require('fine-cmdline').setup({
+    cmdline = {
+      enable_keymaps = true,
+      smart_history = false
+    },
+    popup = {
+      position = {
+        row = '10%',
+        col = '50%',
+      },
+      size = {
+        width = '60%',
+        height = 1
+      },
+      border = {
+        style = 'rounded',
+        highlight = 'FloatBorder',
+      },
+      win_options = {
+        winhighlight = 'Normal:Normal',
+      },
+    },
+    hooks = {
+      before_mount = function(input)
+        -- code
+      end,
+      after_mount = function(input)
+        -- code
+      end,
+      set_keymaps = function(imap, feedkeys)
+        -- code
+      end
+    }
+  })
+<
+
+                                         *fine-cmdline.cmdline.enable_keymaps*
+
+Boolean (default true)
+When set to `false` this plugin will not set the default keybindings inside
+the floating input. This is to ease the integration with completion engines.
+You can still restore some of the default behavior on the |set_keymaps| hook.
+
+                                          *fine-cmdline.cmdline.smart_history*
+
+Boolean (default false)
+When enabled the user's input becomes a search term, and when they navigate
+the command history, only the entries that begin with that term show up.
+
+                                                          *fine-cmdline.popup*
+
+Are the options that control the popup's settings. Accepts any valid key/value
+pair that a `nui.popup` can handle. For more details refer to `nui.nvim`
+documentation:
+https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup#options
+
+                                                 *fine-cmdline.popup.position*
+
+Determines in which part of the screen the input should be drawn.
+
+                                                     *fine-cmdline.popup.size*
+
+Controls the size of the popup. If `size` can be a `number` or
+`percentage string`, can also be a table with `width` and `height`. Do note
+input can only have `1` line.
+
+                                                   *fine-cmdline.popup.border*
+
+Contains all border related options like style, text highlight, etc.
+
+
+                                              *fine-cmdline.popup.win_options*
+
+You can set any variable local to a window (ie. 'signcolumn').
+See |options.txt|
+
+                                              *fine-cmdline.popup.buf_options*
+
+You can set any variable local to a window (ie. 'filetype').
+See |options.txt|
+
+                                                          *fine-cmdline.hooks*
+
+Functions that will be executed during the lifecycle of the input.
+
+                                             *fine-cmdline.hooks.before_mount*
+                                                  *fine-cmdline-change-prompt*
+
+Gets executed before the input drawn in the screen. Receives the instance of
+the input as a parameter. In here we could change the prompt.
+
+>
+  require('fine-cmdline').setup({
+    hooks = {
+      before_mount = function()
+        -- Beware, the prompt can influence the completion engine
+        input.input_props.prompt = ':'
+      end
+    }
+  })
+<
+
+                                              *fine-cmdline.hooks.after_mount*
+
+Gets executed after the input is drawn on the screen. Receives the
+instance of the input as a parameter.
+
+                                              *fine-cmdline.hooks.set_keymaps*
+
+Because each input creates a new buffer you can only bind keys after the input
+is drawn on the screen.
+
+==============================================================================
+Keymaps                                                 *fine-cmdline-keymaps*
+
+With `set_keymaps` you get two parameters. `imap` makes mappings in insert mode.
+`feedkeys` can type keys for you.
+
+Let's say you want to create a shortcut (`Alt + s`) to begin a search and
+replace.
+
+>
+  set_keymaps = function(imap, feedkeys)
+    imap('<M-s>', '%s///gc<Left><Left><Left><Left>')
+  end
+<
+
+If you need something more complex you can use a function.
+
+>
+  set_keymaps = function(imap, feedkeys)
+    imap('<M-s>', function()
+      if vim.fn.pumvisible() == 0 then
+        feedkeys('%s///gc<Left><Left><Left><Left>')
+      end
+    end)
+  end
+<
+                                                        *fine-cmdline-actions*
+                                                             *fine-cmdline.fn*
+
+Every function bound to a default keybinding is exposed in `.fn`. This makes
+it possible to restore any default keybinding when |cmdline.enable_keymaps| is
+set to `false`.
+
+>
+  set_keymaps = function(imap, feedkeys)
+    local fn = require('fine-cmdline').fn
+
+    imap('<Esc>', fn.close)
+    imap('<C-c>', fn.close)
+
+    imap('<Up>', fn.up_history)
+    imap('<Down>', fn.down_history)
+  end
+<
+                                                       *fine-cmdline.fn.close*
+
+If completion menu is visible, hide it. Else, unmounts the input.
+
+                                                   *fine-cmdline.fn.next_item*
+
+Go to the next item in the completion list.
+
+                                               *fine-cmdline.fn.previous_item*
+
+Go to the previous item in the completion list.
+
+                                       *fine-cmdline.fn.complete_or_next_item*
+
+Shows the completion menu if is not visible. Else, navigates to the next item
+in the completion list.
+
+                                                  *fine-cmdline.fn.up_history*
+
+Replaces the text in the input with the previous entry in the command history.
+
+                                                *fine-cmdline.fn.down_history*
+
+Replaces the text in the input with the next entry in the command history.
+
+                                           *fine-cmdline.fn.up_search_history*
+
+Take the user input, start a search and show the previous entry that start
+with that prefix.
+
+                                         *fine-cmdline.fn.down_search_history*
+
+Take the user input, start a search and show the next entry that start with
+that prefix.
+
+==============================================================================
+Completion engines                       *fine-cmdline-and-completion-engines*
+
+Default keybindings can get in the way of common conventions for completion
+engines. To solve this there is a way to disable all default keybindings.
+
+But not all defaults are bad, you can add the ones you like.
+Here is a complete example.
+
+>
+  local fineline = require('fine-cmdline')
+  local fn = fineline.fn
+
+  fineline.setup({
+    cmdline = {
+      enable_keymaps = false
+    },
+    popup = {
+      buf_options = {
+        -- Setup a special file type if you need to
+        filetype = 'FineLinePrompt'
+      }
+    },
+    hooks = {
+      before_mount = function(input)
+        -- Prompt can influence the completion engine.
+        -- This is your chance to change it to something that works for you
+        input.input_props.prompt = ': '
+      end,
+      set_keymaps = function(imap, feedkeys)
+        -- Restore default keybindings...
+        -- Except for `<Tab>`, that's what everyone uses to autocomplete
+        imap('<Esc>', fn.close)
+        imap('<C-c>', fn.close)
+
+        -- enable these if you want simple history navigation
+        -- imap('<Up>', fn.up_history)
+        -- imap('<Down>', fn.down_history)
+
+        -- enable these if you want smart history navigation
+        -- imap('<Up>', fn.up_search_history)
+        -- imap('<Down>', fn.down_search_history)
+      end
+    }
+  })
+<
+
+==============================================================================
+Caveats                                                 *fine-cmdline-caveats*
+
+This is not a special mode. It's just a normal buffer, incremental search
+will not work here.
+
+There is a known issue with |cmdwin| (the thing that shows up when you press
+`q:` by accident). `cmdwin` and `fine-cmdline` have the same goal, execute
+ex-commands. Problem is `cmdwin` will be the one executing the command,
+and you will bump into some weird behavior. If for some reason you're in
+`cmdwin` and call `fine-cmdline`, press `<C-c>` twice (one to close the
+input, one to close `cmdwin`). Don't try anything else. Just close both.
+
+
+==============================================================================
+Support                                                *fine-cmdline-donation*
+
+If you find this tool useful and want to support my efforts, consider
+leaving a tip in https://www.buymeacoffee.com/vonheikemen
+
