@@ -13,43 +13,53 @@ navigate the command history with `<Up>` and `<Down>` arrows. That's it.
 ==============================================================================
 Quick Start                                          *fine-cmdline-quickstart*
 
-You just need to require this plugin and call `.open()`... in a keybinding.
+The easiest way to use it is calling `FineCmdline`... in a keybinding.
+
+Remap `Enter`.
 
 Lua bindings:
 
 >
-  vim.api.nvim_set_keymap(
-    'n',
-    '<C-p>',
-    '<cmd>lua require("fine-cmdline").open()<CR>',
-    {noremap = true}
-  )
+  vim.api.nvim_set_keymap('n', '<CR>', '<cmd>FineCmdline<CR>', {noremap=true})
 <
 
 If you'd like to remap `:` instead.
 
 >
-  vim.api.nvim_set_keymap(
-    'n',
-    ':',
-    '<cmd>lua require("fine-cmdline").open()<CR>',
-    {noremap = true}
-  )
+  vim.api.nvim_set_keymap('n', ':', '<cmd>FineCmdline<CR>', {noremap=true})
 <
 
 Vimscript bindings:
 
 >
-  nnoremap <C-p> <cmd>lua require('fine-cmdline').open()<CR>
+  nnoremap <CR> <cmd>FineCmdline<CR>
 <
 
 If you'd like to remap `:` instead.
 
 >
-  nnoremap : <cmd>lua require('fine-cmdline').open()<CR>
+  nnoremap : <cmd>FineCmdline<CR>
 <
+
+There is also the possibility to pre-populate the input with something before
+it shows up. Say you want to create a keybinding to use `vimgrep`.
+
+>
+  <cmd>FineCmdline vimgrep <CR>
+<
+
+                                                       *fine-cmdline-from-lua*
+                                                           *fine-cmdline.open*
+
+`FineCmdline` is an alias for the function `.open()` in the `fine-cmdline`
+module. So this is also valid.
+
+>
+  <cmd>lua require("fine-cmdline").open({default_value = ""})<CR>
+<
+
 ==============================================================================
-Configuration                                      *fine-cmdline-configuration*
+Configuration                                     *fine-cmdline-configuration*
                                                           *fine-cmdline.setup*
 
 If you want to change anything from the `ui` or add a "hook" you can use
@@ -173,8 +183,8 @@ is drawn on the screen.
 ==============================================================================
 Keymaps                                                 *fine-cmdline-keymaps*
 
-With `set_keymaps` you get two parameters. `imap` makes mappings in insert mode.
-`feedkeys` can type keys for you.
+With `set_keymaps` you get two parameters. `imap` makes mappings in
+insert mode. `feedkeys` can type keys for you.
 
 Let's say you want to create a shortcut (`Alt + s`) to begin a search and
 replace.
@@ -200,8 +210,8 @@ If you need something more complex you can use a function.
                                                              *fine-cmdline.fn*
 
 Every function bound to a default keybinding is exposed in `.fn`. This makes
-it possible to restore any default keybinding when |cmdline.enable_keymaps| is
-set to `false`.
+it possible to restore any default keybinding when |cmdline.enable_keymaps|
+is set to `false`.
 
 >
   set_keymaps = function(imap, feedkeys)

@@ -40,40 +40,46 @@ use {
 
 ## Usage
 
-You just need to require this plugin and call `.open()`... in a keybinding.
+The easiest way to use it is calling `FineCmdline`... in a keybinding.
+
+Remap `Enter`.
 
 * **Lua Bindings**
 
 ```lua
-vim.api.nvim_set_keymap(
-  'n',
-  '<C-p>',
-  '<cmd>lua require("fine-cmdline").open()<CR>',
-  {noremap = true}
-)
+vim.api.nvim_set_keymap('n', '<CR>', '<cmd>FineCmdline<CR>', {noremap = true})
 ```
 
 If you'd like to remap `:` instead.
 
 ```lua
-vim.api.nvim_set_keymap(
-  'n',
-  ':',
-  '<cmd>lua require("fine-cmdline").open()<CR>',
-  {noremap = true}
-)
+vim.api.nvim_set_keymap('n', ':', '<cmd>FineCmdline<CR>', {noremap = true})
 ```
 
 * **Vimscript Bindings**
 
 ```vim
-nnoremap <C-p> <cmd>lua require('fine-cmdline').open()<CR>
+nnoremap <CR> <cmd>FineCmdline<CR>
 ```
 
 If you'd like to remap `:` instead.
 
 ```vim
-nnoremap : <cmd>lua require('fine-cmdline').open()<CR>
+nnoremap : <cmd>FineCmdline<CR>
+```
+
+There is also the possibility to pre-populate the input with something before it shows up. Say you want to create a keybinding to use `vimgrep`.
+
+```vim
+<cmd>FineCmdline vimgrep <CR>
+```
+
+### Open from lua
+
+`FineCmdline` is an alias for the `.open()` function in the `fine-cmdline` module. So you could also use this.
+
+```lua
+<cmd>lua require("fine-cmdline").open({default_value = ""})<CR>
 ```
 
 ### Configuration

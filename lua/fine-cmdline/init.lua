@@ -43,8 +43,10 @@ local defaults = {
 }
 
 M.input = nil
-M.setup = function(config)
+M.setup = function(config, input_opts)
   config = config or {}
+  input_opts = input_opts or {}
+
   state.user_opts = config
 
   local popup_options = fn.merge(defaults.popup, config.popup)
@@ -53,7 +55,7 @@ M.setup = function(config)
 
   M.input = Input(popup_options, {
     prompt = ': ',
-    default_value = '',
+    default_value = input_opts.default_value,
     on_submit = function(value)
       fn.reset_history()
       vim.fn.histadd('cmd', value)
@@ -66,8 +68,8 @@ M.setup = function(config)
   })
 end
 
-M.open = function()
-  M.setup(state.user_opts)
+M.open = function(opts)
+  M.setup(state.user_opts, opts)
   state.hooks.before_mount(M.input)
 
   M.input:mount()
