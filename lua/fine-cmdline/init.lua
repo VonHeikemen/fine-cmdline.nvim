@@ -225,7 +225,6 @@ M.fn.previous_item = function()
 end
 
 fn.replace_line = function(cmd)
-  vim.cmd('normal Vc')
   vim.api.nvim_buf_set_lines(
     M.input.bufnr,
     vim.fn.line('.') - 1,
