@@ -10,7 +10,9 @@ local state = {
   idx_hist = 0,
   hooks = {},
   cmdline = {},
-  user_opts = {}
+  user_opts = {},
+  prompt_length = 0,
+  prompt_content = ''
 }
 
 local defaults = {
@@ -79,11 +81,17 @@ M.open = function(opts)
   end
 
   fn.map('<BS>', function()
-    fn.prompt_backspace(M.input.input_props.prompt:len())
+    fn.prompt_backspace(state.prompt_length)
   end)
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
+
+  -- Prompt might not be a string anymore. Need to deal with that.
+  state.prompt_length = fn.prompt_length(M.input)
+  state.prompt_content = type(M.input.input_props.prompt) == 'string'
+    and M.input.input_props.prompt
+    or M.input.input_props.prompt:content()
 end
 
 fn.on_change = function()
@@ -125,7 +133,7 @@ M.fn.close = function()
 end
 
 M.fn.up_search_history = function()
-  local prompt = M.input.input_props.prompt:len()
+  local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
   local prev_cmd = state.history and state.history[state.idx_hist]
@@ -152,7 +160,7 @@ M.fn.up_search_history = function()
 end
 
 M.fn.down_search_history = function()
-  local prompt = M.input.input_props.prompt:len()
+  local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
   local prev_cmd = state.history and state.history[state.idx_hist]
@@ -231,7 +239,7 @@ fn.replace_line = function(cmd)
     vim.fn.line('.') - 1,
     vim.fn.line('.'),
     true,
-    {M.input.input_props.prompt ..  cmd}
+    {state.prompt_content ..  cmd}
   )
 
   vim.api.nvim_win_set_cursor(
@@ -300,6 +308,19 @@ fn.prompt_backspace = function(prompt)
     vim.api.nvim_buf_set_text(0, line - 1, col - 1, line - 1, col, {''})
     vim.api.nvim_win_set_cursor(0, {line, col - 1})
   end
+end
+
+fn.prompt_length = function(input)
+  local prompt = input.input_props.prompt
+  local prompt_length = 0
+
+  if type(prompt.length) == 'function' then
+    prompt_length = prompt:length()
+  elseif type(prompt.len) == 'function' then
+    prompt_length = prompt:len()
+  end
+
+  return prompt_length
 end
 
 return M
