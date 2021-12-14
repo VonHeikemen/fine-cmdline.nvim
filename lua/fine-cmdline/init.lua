@@ -18,7 +18,7 @@ local state = {
 local defaults = {
   cmdline = {
     enable_keymaps = true,
-    smart_history = false
+    smart_history = true
   },
   popup = {
     position = {

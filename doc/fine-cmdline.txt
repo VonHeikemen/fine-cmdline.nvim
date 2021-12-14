@@ -71,7 +71,7 @@ Here is an example showing all the default values.
   require('fine-cmdline').setup({
     cmdline = {
       enable_keymaps = true,
-      smart_history = false
+      smart_history = true
     },
     popup = {
       position = {
@@ -113,7 +113,7 @@ You can still restore some of the default behavior on the |set_keymaps| hook.
 
                                           *fine-cmdline.cmdline.smart_history*
 
-Boolean (default false)
+Boolean (default true)
 When enabled the user's input becomes a search term, and when they navigate
 the command history, only the entries that begin with that term show up.
 
