@@ -167,6 +167,11 @@ M.fn.up_search_history = function()
 
     idx = idx + 1
   end
+
+  state.idx_hist = 1
+  if user_input ~= state.query then
+    fn.replace_line(state.query)
+  end
 end
 
 M.fn.down_search_history = function()
@@ -192,6 +197,11 @@ M.fn.down_search_history = function()
     end
 
     idx = idx - 1
+  end
+
+  state.idx_hist = #state.history
+  if user_input ~= state.query then
+    fn.replace_line(state.query)
   end
 end
 
