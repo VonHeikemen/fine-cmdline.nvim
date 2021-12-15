@@ -97,14 +97,25 @@ end
 fn.on_change = function()
   local prev_hist_idx = 0
   return function(value)
-    if value == '' then return end
-
+    -- Index match, means user is modifying the input
     if prev_hist_idx == state.idx_hist then
       state.query = value
       return
     end
 
+    -- Got an empty string with different index then is
+    -- likely the user is navigating the history. This
+    -- empty string *should* be because replace_line
+    -- is deleting the current the string in the input.
+    if value == '' then
+      return
+    end
+
+    -- We get here. Index don't match but there is
+    -- a new value. Means this new value comes from
+    -- the history. So we should sync the index.
     prev_hist_idx = state.idx_hist
+
   end
 end
 
@@ -136,9 +147,8 @@ M.fn.up_search_history = function()
   local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
-  local prev_cmd = state.history and state.history[state.idx_hist]
 
-  if (line:len() == prompt) then
+  if line:len() == prompt then
     M.fn.up_history()
     return
   end
@@ -163,9 +173,8 @@ M.fn.down_search_history = function()
   local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
-  local prev_cmd = state.history and state.history[state.idx_hist]
 
-  if (line:len() == prompt) then
+  if line:len() == prompt then
     M.fn.down_history()
     return
   end
