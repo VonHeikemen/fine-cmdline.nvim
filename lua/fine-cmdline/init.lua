@@ -124,7 +124,7 @@ fn.keymaps = function()
   fn.map('<C-c>', M.fn.close)
 
   fn.map('<Tab>', M.fn.complete_or_next_item)
-  fn.map('<S-Tab>', M.fn.previous_item)
+  fn.map('<S-Tab>', M.fn.stop_complete_or_previous_item)
 
   if state.cmdline.smart_history then
     fn.map('<Up>', M.fn.up_search_history)
@@ -139,6 +139,7 @@ M.fn.close = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-e>')
   else
+    fn.feedkeys('<C-x><C-z>')
     M.input.input_props.on_close()
   end
 end
@@ -239,6 +240,14 @@ M.fn.complete_or_next_item = function()
   end
 end
 
+M.fn.stop_complete_or_previous_item = function()
+  if vim.fn.pumvisible() == 1 then
+    fn.feedkeys('<C-p>')
+  else
+    fn.feedkeys('<C-x><C-z>')
+  end
+end
+
 M.fn.next_item = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-n>')
@@ -309,7 +318,7 @@ end
 
 fn.feedkeys = function(keys)
   vim.api.nvim_feedkeys(
-    vim.api.nvim_replace_termcodes(keys, true, true, true),
+    vim.api.nvim_replace_termcodes(keys, true, false, true),
     'i',
     true
   )

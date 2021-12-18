@@ -188,6 +188,8 @@ local fn = require('fine-cmdline').fn
 
 - `fn.complete_or_next_item`: Shows the completion menu if is not visible. Else, navigates to the next item in the completion list.
 
+- `fn.stop_complete_or_previous_item`: If completion menu is visible go to previous item. Else, stop completion without changing the input text.
+
 - `fn.up_history`: Replaces the text in the input with the previous entry in the command history.
 
 - `fn.down_history`: Replaces the text in the input with the next entry in the command history.
