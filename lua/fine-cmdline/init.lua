@@ -62,7 +62,13 @@ M.setup = function(config, input_opts)
     on_submit = function(value)
       fn.reset_history()
       vim.fn.histadd('cmd', value)
-      vim.cmd(value)
+
+      local ok, err = pcall(vim.cmd, value)
+      if not ok then
+        local idx = err:find(':E')
+        local msg = err:sub(idx + 1)
+        vim.notify(msg, vim.log.levels.ERROR)
+      end
     end,
     on_close = function()
       fn.reset_history()
