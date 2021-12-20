@@ -18,7 +18,8 @@ local state = {
 local defaults = {
   cmdline = {
     enable_keymaps = true,
-    smart_history = true
+    smart_history = true,
+    prompt = ': '
   },
   popup = {
     position = {
@@ -56,7 +57,7 @@ M.setup = function(config, input_opts)
   state.cmdline = fn.merge(defaults.cmdline, config.cmdline)
 
   M.input = Input(popup_options, {
-    prompt = ': ',
+    prompt = state.cmdline.prompt,
     default_value = input_opts.default_value,
     on_submit = function(value)
       fn.reset_history()

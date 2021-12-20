@@ -71,7 +71,8 @@ Here is an example showing all the default values.
   require('fine-cmdline').setup({
     cmdline = {
       enable_keymaps = true,
-      smart_history = true
+      smart_history = true,
+      prompt = ': '
     },
     popup = {
       position = {
@@ -158,17 +159,6 @@ Functions that will be executed during the lifecycle of the input.
 
 Gets executed before the input drawn in the screen. Receives the instance of
 the input as a parameter. In here we could change the prompt.
-
->
-  require('fine-cmdline').setup({
-    hooks = {
-      before_mount = function()
-        -- Beware, the prompt can influence the completion engine
-        input.input_props.prompt = ':'
-      end
-    }
-  })
-<
 
                                               *fine-cmdline.hooks.after_mount*
 
@@ -274,6 +264,11 @@ Here is a complete example.
 
   fineline.setup({
     cmdline = {
+      -- Prompt can influence the completion engine.
+      -- Change it to something that works for you
+      prompt = ': ',
+
+      -- Let the user handler the keybindings
       enable_keymaps = false
     },
     popup = {
@@ -283,11 +278,6 @@ Here is a complete example.
       }
     },
     hooks = {
-      before_mount = function(input)
-        -- Prompt can influence the completion engine.
-        -- This is your chance to change it to something that works for you
-        input.input_props.prompt = ': '
-      end,
       set_keymaps = function(imap, feedkeys)
         -- Restore default keybindings...
         -- Except for `<Tab>`, that's what everyone uses to autocomplete

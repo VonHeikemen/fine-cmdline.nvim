@@ -92,7 +92,8 @@ This are the defaults.
 require('fine-cmdline').setup({
   cmdline = {
     enable_keymaps = true,
-    smart_history = true
+    smart_history = true,
+    prompt = ': '
   },
   popup = {
     position = {
@@ -129,24 +130,13 @@ require('fine-cmdline').setup({
 
 - `cmdline.smart_history`, when set to true use the user input as search term, then when you navigate the history only the entries that begin with term will show up. Imagine `PackerSync` is in your command history, just enter the string `Pack` and press `<Up>` to start looking for it.
 
+- `cmdline.prompt` sets the text for the prompt.
+
 - `popup` is passed directly to `nui.popup`. You can check the valid keys in their documentation: [popup.options](https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup#options)
 
 - `hooks` must be functions. They will be executed during the "lifecycle" of the input.
 
 *before_mount* and *after_mount* receive the instance of the input, so you can do anything with it.
-
-A good use case for this would be to change the prompt (do it at your own risk).
-
-```lua
-require('fine-cmdline').setup({
-  hooks = {
-    before_mount = function(input)
-      -- Beware, the prompt can mess around with the completion
-      input.input_props.prompt = ':'
-    end
-  }
-})
-```
 
 `set_keymaps`. Why is this even in a "hook"? Funny story, you can only map keys after the input is mounted. And there are other not so funny quirks. So I thought I could make things easier for you.
 
@@ -229,13 +219,15 @@ local fn = fineline.fn
 
 fineline.setup({
   cmdline = {
+    -- Prompt can influence the completion engine.
+    -- Change it to something that works for you
+    prompt = ': ',
+
+    -- Let the user handle the keybindings
     enable_keymaps = false
   },
   hooks = {
     before_mount = function(input)
-      -- Prompt can influence the completion engine.
-      -- This is your chance to change it to something that works for you
-      input.input_props.prompt = ': '
     end,
     set_keymaps = function(imap, feedkeys)
       -- Restore default keybindings...
