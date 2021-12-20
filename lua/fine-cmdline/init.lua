@@ -75,6 +75,8 @@ M.open = function(opts)
   state.hooks.before_mount(M.input)
 
   M.input:mount()
+  -- Set custom function for autocompletion
+  vim.bo.omnifunc = 'v:lua._fine_cmdline_omnifunc'
 
   if state.cmdline.enable_keymaps then
     fn.keymaps()
@@ -236,7 +238,7 @@ M.fn.complete_or_next_item = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-n>')
   else
-    fn.feedkeys('<C-x><C-v>')
+    fn.feedkeys('<C-x><C-o>')
   end
 end
 
@@ -258,6 +260,23 @@ M.fn.previous_item = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-p>')
   end
+end
+
+M.omnifunc = function(start, base)
+  local prompt_length = state.prompt_length
+  local line = vim.fn.getline('.')
+  local input = line:sub(prompt_length + 1)
+
+  if start == 1 then
+    local split = vim.split(input, ' ')
+    local last_word = split[#split]
+
+    return #line - #last_word
+  end
+
+  return vim.api.nvim_buf_call(vim.fn.bufnr('#'), function()
+    return vim.fn.getcompletion(input .. base, 'cmdline')
+  end)
 end
 
 fn.replace_line = function(cmd)
@@ -351,5 +370,8 @@ fn.prompt_length = function(input)
   return prompt_length
 end
 
+-- v:lua doesn't like require'fine-cmdline'.omnifunc
+-- so global variable it is.
+_fine_cmdline_omnifunc = M.omnifunc
 return M
 
