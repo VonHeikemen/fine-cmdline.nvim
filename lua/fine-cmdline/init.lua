@@ -66,7 +66,7 @@ M.setup = function(config, input_opts)
       local ok, err = pcall(vim.cmd, value)
       if not ok then
         local idx = err:find(':E')
-        local msg = err:sub(idx + 1):sub('\t', '    ')
+        local msg = err:sub(idx + 1):gsub('\t', '    ')
         vim.notify(msg, vim.log.levels.ERROR)
       end
     end,
