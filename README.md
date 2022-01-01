@@ -38,6 +38,13 @@ use {
 }
 ```
 
+With `paq`
+
+```lua
+'MunifTanjim/nui.nvim';
+'VonHeikemen/fine-cmdline.nvim';
+```
+
 ## Usage
 
 The easiest way to use it is calling `FineCmdline`... in a keybinding.
