@@ -95,9 +95,9 @@ M.open = function(opts)
 
   -- Prompt might not be a string anymore. Need to deal with that.
   state.prompt_length = fn.prompt_length(M.input)
-  state.prompt_content = type(M.input.input_props.prompt) == 'string'
-    and M.input.input_props.prompt
-    or M.input.input_props.prompt:content()
+  state.prompt_content = type(M.input._.prompt) == 'string'
+    and M.input._.prompt
+    or M.input._.prompt:content()
 end
 
 fn.on_change = function()
@@ -345,7 +345,7 @@ fn.prompt_backspace = function(prompt)
 end
 
 fn.prompt_length = function(input)
-  local prompt = input.input_props.prompt
+  local prompt = input._.prompt
   local prompt_length = 0
 
   if type(prompt.length) == 'function' then
