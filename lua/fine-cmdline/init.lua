@@ -56,6 +56,9 @@ M.setup = function(config, input_opts)
   state.hooks = fn.merge(defaults.hooks, config.hooks)
   state.cmdline = fn.merge(defaults.cmdline, config.cmdline)
 
+  state.prompt_length = state.cmdline.prompt:len()
+  state.prompt_content = state.cmdline.prompt
+
   M.input = Input(popup_options, {
     prompt = state.cmdline.prompt,
     default_value = input_opts.default_value,
@@ -95,12 +98,6 @@ M.open = function(opts)
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
-
-  -- Prompt might not be a string anymore. Need to deal with that.
-  state.prompt_length = fn.prompt_length(M.input)
-  state.prompt_content = type(M.input._.prompt) == 'string'
-    and M.input._.prompt
-    or M.input._.prompt:content()
 end
 
 fn.on_change = function()
@@ -362,19 +359,6 @@ fn.prompt_backspace = function(prompt)
     vim.api.nvim_buf_set_text(0, line - 1, col - 1, line - 1, col, {''})
     vim.api.nvim_win_set_cursor(0, {line, col - 1})
   end
-end
-
-fn.prompt_length = function(input)
-  local prompt = input._.prompt
-  local prompt_length = 0
-
-  if type(prompt.length) == 'function' then
-    prompt_length = prompt:length()
-  elseif type(prompt.len) == 'function' then
-    prompt_length = prompt:len()
-  end
-
-  return prompt_length
 end
 
 -- v:lua doesn't like require'fine-cmdline'.omnifunc
