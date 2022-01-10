@@ -332,17 +332,16 @@ end
 
 fn.map = function(lhs, rhs)
   if type(rhs) == 'string' then
-    local keys = rhs
-    rhs = function() fn.feedkeys(keys) end
+    vim.api.nvim_buf_set_keymap(M.input.bufnr, 'i', lhs, rhs, {noremap = true})
+  else
+    M.input:map('i', lhs, rhs, {noremap = true}, true)
   end
-
-  M.input:map('i', lhs, rhs, {noremap = true}, true)
 end
 
 fn.feedkeys = function(keys)
   vim.api.nvim_feedkeys(
-    vim.api.nvim_replace_termcodes(keys, true, false, true),
-    'i',
+    vim.api.nvim_replace_termcodes(keys, true, true, true),
+    'n',
     true
   )
 end
