@@ -274,8 +274,18 @@ M.omnifunc = function(start, base)
   if start == 1 then
     local split = vim.split(input, ' ')
     local last_word = split[#split]
+    local len = #line - #last_word
 
-    return #line - #last_word
+    for i=#split - 1, 1, -1 do
+      local word = split[i]
+      if vim.endswith(word, [[\\]]) then
+        break
+      elseif vim.endswith(word, [[\]]) then
+        len = len - #word - 1
+      end
+    end
+
+    return len
   end
 
   return vim.api.nvim_buf_call(vim.fn.bufnr('#'), function()
