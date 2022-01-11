@@ -28,20 +28,18 @@ local defaults = {
     },
     size = {
       width = '60%',
-      height = 1
     },
     border = {
       style = 'rounded',
-      highlight = 'FloatBorder',
     },
     win_options = {
-      winhighlight = 'Normal:Normal',
+      winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
     },
   },
   hooks = {
-    before_mount = function() end,
-    after_mount = function() end,
-    set_keymaps = function() end
+    before_mount = function(input) end,
+    after_mount = function(input) end,
+    set_keymaps = function(imap, feedkeys) end
   }
 }
 

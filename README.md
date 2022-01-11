@@ -102,14 +102,12 @@ require('fine-cmdline').setup({
     },
     size = {
       width = '60%',
-      height = 1
     },
     border = {
       style = 'rounded',
-      highlight = 'FloatBorder',
     },
     win_options = {
-      winhighlight = 'Normal:Normal',
+      winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
     },
   },
   hooks = {
