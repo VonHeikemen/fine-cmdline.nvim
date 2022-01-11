@@ -62,6 +62,8 @@ M.setup = function(config, input_opts)
   M.input = Input(popup_options, {
     prompt = state.cmdline.prompt,
     default_value = input_opts.default_value,
+    on_change = fn.on_change(),
+    on_close = function() fn.reset_history() end,
     on_submit = function(value)
       fn.reset_history()
       vim.fn.histadd('cmd', value)
@@ -72,11 +74,7 @@ M.setup = function(config, input_opts)
         local msg = err:sub(idx + 1):gsub('\t', '    ')
         vim.notify(msg, vim.log.levels.ERROR)
       end
-    end,
-    on_close = function()
-      fn.reset_history()
-    end,
-    on_change = fn.on_change()
+    end
   })
 end
 
@@ -145,7 +143,7 @@ M.fn.close = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-e>')
   else
-    fn.feedkeys('<C-x><C-z>')
+    fn.feedkeys('<C-e>')
     M.input.input_props.on_close()
   end
 end
