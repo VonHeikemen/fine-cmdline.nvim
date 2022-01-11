@@ -145,8 +145,8 @@ M.fn.close = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-e>')
   else
-    fn.feedkeys('<C-e>')
-    M.input.input_props.on_close()
+    fn.feedkeys('<Space>')
+    vim.defer_fn(function() M.input.input_props.on_close() end, 3)
   end
 end
 
