@@ -63,15 +63,8 @@ M.setup = function(config, input_opts)
     on_change = fn.on_change(),
     on_close = function() fn.reset_history() end,
     on_submit = function(value)
-      fn.reset_history()
-      vim.fn.histadd('cmd', value)
-
-      local ok, err = pcall(vim.cmd, value)
-      if not ok then
-        local idx = err:find(':E')
-        local msg = err:sub(idx + 1):gsub('\t', '    ')
-        vim.notify(msg, vim.log.levels.ERROR)
-      end
+      local ok, err = pcall(fn.submit, value)
+      if not ok then pcall(vim.notify, err, vim.log.levels.ERROR) end
     end
   })
 end
@@ -94,6 +87,18 @@ M.open = function(opts)
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
+end
+
+fn.submit = function(value)
+  fn.reset_history()
+  vim.fn.histadd('cmd', value)
+
+  local ok, err = pcall(vim.cmd, value)
+  if not ok then
+    local idx = err:find(':E')
+    local msg = err:sub(idx + 1):gsub('\t', '    ')
+    vim.notify(msg, vim.log.levels.ERROR)
+  end
 end
 
 fn.on_change = function()
