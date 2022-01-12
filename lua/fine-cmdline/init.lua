@@ -18,7 +18,8 @@ local state = {
 local defaults = {
   cmdline = {
     enable_keymaps = true,
-    smart_history = true
+    smart_history = true,
+    prompt = ': '
   },
   popup = {
     position = {
@@ -27,20 +28,18 @@ local defaults = {
     },
     size = {
       width = '60%',
-      height = 1
     },
     border = {
       style = 'rounded',
-      highlight = 'FloatBorder',
     },
     win_options = {
-      winhighlight = 'Normal:Normal',
+      winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
     },
   },
   hooks = {
-    before_mount = function() end,
-    after_mount = function() end,
-    set_keymaps = function() end
+    before_mount = function(input) end,
+    after_mount = function(input) end,
+    set_keymaps = function(imap, feedkeys) end
   }
 }
 
@@ -55,9 +54,14 @@ M.setup = function(config, input_opts)
   state.hooks = fn.merge(defaults.hooks, config.hooks)
   state.cmdline = fn.merge(defaults.cmdline, config.cmdline)
 
+  state.prompt_length = state.cmdline.prompt:len()
+  state.prompt_content = state.cmdline.prompt
+
   M.input = Input(popup_options, {
-    prompt = ': ',
+    prompt = state.cmdline.prompt,
     default_value = input_opts.default_value,
+    on_change = fn.on_change(),
+    on_close = function() fn.reset_history() end,
     on_submit = function(value)
       fn.reset_history()
       vim.fn.histadd('cmd', value)
@@ -68,11 +72,7 @@ M.setup = function(config, input_opts)
         local msg = err:sub(idx + 1):gsub('\t', '    ')
         vim.notify(msg, vim.log.levels.ERROR)
       end
-    end,
-    on_close = function()
-      fn.reset_history()
-    end,
-    on_change = fn.on_change()
+    end
   })
 end
 
@@ -81,6 +81,8 @@ M.open = function(opts)
   state.hooks.before_mount(M.input)
 
   M.input:mount()
+  -- Set custom function for autocompletion
+  vim.bo.omnifunc = 'v:lua._fine_cmdline_omnifunc'
 
   if state.cmdline.enable_keymaps then
     fn.keymaps()
@@ -92,12 +94,6 @@ M.open = function(opts)
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
-
-  -- Prompt might not be a string anymore. Need to deal with that.
-  state.prompt_length = fn.prompt_length(M.input)
-  state.prompt_content = type(M.input._.prompt) == 'string'
-    and M.input._.prompt
-    or M.input._.prompt:content()
 end
 
 fn.on_change = function()
@@ -242,7 +238,7 @@ M.fn.complete_or_next_item = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-n>')
   else
-    fn.feedkeys('<C-x><C-v>')
+    fn.feedkeys('<C-x><C-o>')
   end
 end
 
@@ -264,6 +260,33 @@ M.fn.previous_item = function()
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-p>')
   end
+end
+
+M.omnifunc = function(start, base)
+  local prompt_length = state.prompt_length
+  local line = vim.fn.getline('.')
+  local input = line:sub(prompt_length + 1)
+
+  if start == 1 then
+    local split = vim.split(input, ' ')
+    local last_word = split[#split]
+    local len = #line - #last_word
+
+    for i=#split - 1, 1, -1 do
+      local word = split[i]
+      if vim.endswith(word, [[\\]]) then
+        break
+      elseif vim.endswith(word, [[\]]) then
+        len = len - #word - 1
+      end
+    end
+
+    return len
+  end
+
+  return vim.api.nvim_buf_call(vim.fn.bufnr('#'), function()
+    return vim.fn.getcompletion(input .. base, 'cmdline')
+  end)
 end
 
 fn.replace_line = function(cmd)
@@ -315,17 +338,16 @@ end
 
 fn.map = function(lhs, rhs)
   if type(rhs) == 'string' then
-    local keys = rhs
-    rhs = function() fn.feedkeys(keys) end
+    vim.api.nvim_buf_set_keymap(M.input.bufnr, 'i', lhs, rhs, {noremap = true})
+  else
+    M.input:map('i', lhs, rhs, {noremap = true}, true)
   end
-
-  M.input:map('i', lhs, rhs, {noremap = true}, true)
 end
 
 fn.feedkeys = function(keys)
   vim.api.nvim_feedkeys(
-    vim.api.nvim_replace_termcodes(keys, true, false, true),
-    'i',
+    vim.api.nvim_replace_termcodes(keys, true, true, true),
+    'n',
     true
   )
 end
@@ -344,18 +366,8 @@ fn.prompt_backspace = function(prompt)
   end
 end
 
-fn.prompt_length = function(input)
-  local prompt = input._.prompt
-  local prompt_length = 0
-
-  if type(prompt.length) == 'function' then
-    prompt_length = prompt:length()
-  elseif type(prompt.len) == 'function' then
-    prompt_length = prompt:len()
-  end
-
-  return prompt_length
-end
-
+-- v:lua doesn't like require'fine-cmdline'.omnifunc
+-- so global variable it is.
+_fine_cmdline_omnifunc = M.omnifunc
 return M
 
