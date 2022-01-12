@@ -278,6 +278,8 @@ M.omnifunc = function(start, base)
         break
       elseif vim.endswith(word, [[\]]) then
         len = len - #word - 1
+      else
+        break
       end
     end
 
