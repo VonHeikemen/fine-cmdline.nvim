@@ -81,9 +81,9 @@ M.open = function(opts)
     fn.keymaps()
   end
 
-  fn.map('<BS>', function()
-    fn.prompt_backspace(state.prompt_length)
-  end)
+  if vim.fn.has('nvim-0.7') == 0 then
+    fn.map('<BS>', function() fn.prompt_backspace(state.prompt_length) end)
+  end
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
   state.hooks.after_mount(M.input)
@@ -240,6 +240,7 @@ M.fn.down_history = function()
 end
 
 M.fn.complete_or_next_item = function()
+  state.uses_completion = true
   if vim.fn.pumvisible() == 1 then
     fn.feedkeys('<C-n>')
   else
@@ -368,8 +369,13 @@ fn.prompt_backspace = function(prompt)
   local col = cursor[2]
 
   if col ~= prompt then
+    local completion = vim.fn.pumvisible() == 1 and state.uses_completion
+    if completion then fn.feedkeys('<C-x><C-z>') end
+
     vim.api.nvim_buf_set_text(0, line - 1, col - 1, line - 1, col, {''})
     vim.api.nvim_win_set_cursor(0, {line, col - 1})
+
+    if completion then fn.feedkeys('<C-x><C-o>') end
   end
 end
 
