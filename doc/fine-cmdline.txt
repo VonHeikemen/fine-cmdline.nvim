@@ -250,10 +250,22 @@ that prefix.
 ==============================================================================
 Completion engines                       *fine-cmdline-and-completion-engines*
 
-Default keybindings can get in the way of common conventions for completion
-engines. To solve this there is a way to disable all default keybindings.
+At the moment only this third-party completion engine works inside the
+floating input:
 
-But not all defaults are bad, you can add the ones you like.
+* ddc.vim: https://github.com/Shougo/ddc.vim
+
+Other popular completion engines don't provide completions for ex-commands
+outside the built-in command-line.
+
+If you wish to test your completion engine in `fine-cmdline` here is what you
+need to do:
+
+* Disable the default keybindings.
+* Setup your own keybindings.
+* Maybe, modify the prompt.
+* Perhaps, setup a custom filetype.
+
 Here is a complete example.
 
 >
@@ -299,6 +311,9 @@ Caveats                                                 *fine-cmdline-caveats*
 
 This is not a special mode. It's just a normal buffer, incremental search
 will not work here.
+
+You'll find that most limitations on this plugin are because it can't enable
+`commandline-mode`. When you type in the input your are in `insert mode`.
 
 There is a known issue with |cmdwin| (the thing that shows up when you press
 `q:` by accident). `cmdwin` and `fine-cmdline` have the same goal, execute

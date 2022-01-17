@@ -75,7 +75,7 @@ If you'd like to remap `:` instead.
 nnoremap : <cmd>FineCmdline<CR>
 ```
 
-There is also the possibility to pre-populate the input with something before it shows up. Say you want to create a keybinding to use `vimgrep`.
+There is also the possibility to setup a default value before it shows up. Say you want to create a keybinding to use `vimgrep`.
 
 ```vim
 <cmd>FineCmdline vimgrep <CR>
@@ -93,7 +93,7 @@ There is also the possibility to pre-populate the input with something before it
 
 If you want to change anything from the `ui` or add a "hook" you can use `.setup()`.
 
-This are the defaults.
+These are the defaults.
 
 ```lua
 require('fine-cmdline').setup({
@@ -131,9 +131,9 @@ require('fine-cmdline').setup({
 })
 ```
 
-- `cmdline.enable_keymaps`, when set to true map the recommended default keybindings. If you set to `false` you will need to do map yourself the keys in the `set_keymaps` hook.
+- `cmdline.enable_keymaps`, when set to true use the recommended keybindings. If you set to `false` you will need to do bind the keys in the `set_keymaps` hook.
 
-- `cmdline.smart_history`, when set to true use the user input as search term, then when you navigate the history only the entries that begin with term will show up. Imagine `PackerSync` is in your command history, just enter the string `Pack` and press `<Up>` to start looking for it.
+- `cmdline.smart_history`, when set to true use the string in the input as a search term, then when you navigate the history only the entries that begin with that term will show up. Imagine `PackerSync` is in your command history, just enter the string `Pack` and press `<Up>` to start looking for it.
 
 - `cmdline.prompt` sets the text for the prompt.
 
@@ -143,7 +143,7 @@ require('fine-cmdline').setup({
 
 *before_mount* and *after_mount* receive the instance of the input, so you can do anything with it.
 
-`set_keymaps`. Why is this even in a "hook"? Funny story, you can only map keys after the input is mounted. And there are other not so funny quirks. So I thought I could make things easier for you.
+`set_keymaps`. Why is this even in a "hook"? Funny story, you can only bind keys after the input is mounted. And there are other not so funny quirks. So I thought I could make things easier for you.
 
 ### Setting keymaps
 
@@ -208,15 +208,20 @@ end
 
 ### Integration with completion engines
 
-Default keybindings can get in the way of common conventions for completion engines. To work around this there is a way to disable all default keybindings.
+At the moment only this third-party completion engine works inside the floating input:
 
-```lua
-cmdline = {
-  enable_keymaps = false
-}
-```
+* [ddc.vim](https://github.com/Shougo/ddc.vim)
 
-But not all defaults are bad, you can add the ones you like. Here is a complete example.
+Other popular completion engines don't provide completions for ex-commands outside the built-in command-line.
+
+If you wish to test your completion engine in `fine-cmdline` here is what you need to do:
+
+* Disable the default keybindings.
+* Setup your own keybindings.
+* Maybe, modify the prompt.
+* Perhaps, setup a custom filetype.
+
+Here is a complete example.
 
 ```lua
 local fineline = require('fine-cmdline')
@@ -231,9 +236,13 @@ fineline.setup({
     -- Let the user handle the keybindings
     enable_keymaps = false
   },
+  popup = {
+    buf_options = {
+      -- Setup a special file type if you need to
+      filetype = 'FineCmdlinePrompt'
+    }
+  },
   hooks = {
-    before_mount = function(input)
-    end,
     set_keymaps = function(imap, feedkeys)
       -- Restore default keybindings...
       -- Except for `<Tab>`, that's what everyone uses to autocomplete
@@ -250,6 +259,8 @@ fineline.setup({
 ## Caveats
 
 This is not a special mode. It's just a normal buffer, incremental search will not work here.
+
+You'll find that most limitations on this plugin are because it can't enable `commandline-mode`. When you type in the input your are in `insert mode`.
 
 There is a known issue with [cmdwin](https://neovim.io/doc/user/cmdline.html#cmdwin) (the thing that shows up when you press `q:` by accident). `cmdwin` and `fine-cmdline` have the same goal, execute ex-commands. Problem is `cmdwin` will be the one executing the command, and you will bump into some weird behavior. If for some reason you're in `cmdwin` and call `fine-cmdline`, press `<C-c>` twice (one to close the input, one to close `cmdwin`). Don't try anything else. Just close both.
 
