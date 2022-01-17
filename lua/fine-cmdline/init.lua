@@ -1,9 +1,6 @@
 local M = {fn = {}}
 local fn = {}
 
-local Input = require('nui.input')
-local event = require('nui.utils.autocmd').event
-
 local state = {
   query = '',
   history = nil,
@@ -57,20 +54,25 @@ M.setup = function(config, input_opts)
   state.prompt_length = state.cmdline.prompt:len()
   state.prompt_content = state.cmdline.prompt
 
-  M.input = Input(popup_options, {
-    prompt = state.cmdline.prompt,
-    default_value = input_opts.default_value,
-    on_change = fn.on_change(),
-    on_close = function() fn.reset_history() end,
-    on_submit = function(value)
-      local ok, err = pcall(fn.submit, value)
-      if not ok then pcall(vim.notify, err, vim.log.levels.ERROR) end
-    end
-  })
+  return {
+    popup = popup_options,
+    input = {
+      prompt = state.cmdline.prompt,
+      default_value = input_opts.default_value,
+      on_change = fn.on_change(),
+      on_close = function() fn.reset_history() end,
+      on_submit = function(value)
+        local ok, err = pcall(fn.submit, value)
+        if not ok then pcall(vim.notify, err, vim.log.levels.ERROR) end
+      end
+    }
+  }
 end
 
 M.open = function(opts)
-  M.setup(state.user_opts, opts)
+  local ui = M.setup(state.user_opts, opts)
+
+  M.input = require('nui.input')(ui.popup, ui.input)
   state.hooks.before_mount(M.input)
 
   M.input:mount()
