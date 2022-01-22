@@ -154,6 +154,8 @@ M.fn.close = function()
 end
 
 M.fn.up_search_history = function()
+  if vim.fn.pumvisible() == 1 then return end
+
   local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
@@ -185,6 +187,8 @@ M.fn.up_search_history = function()
 end
 
 M.fn.down_search_history = function()
+  if vim.fn.pumvisible() == 1 then return end
+
   local prompt = state.prompt_length
   local line = vim.fn.getline('.')
   local user_input = line:sub(prompt + 1, vim.fn.col('.'))
@@ -216,6 +220,8 @@ M.fn.down_search_history = function()
 end
 
 M.fn.up_history = function()
+  if vim.fn.pumvisible() == 1 then return end
+
   fn.cmd_history()
   state.idx_hist = state.idx_hist + 1
   local cmd = state.history[state.idx_hist]
@@ -229,6 +235,8 @@ M.fn.up_history = function()
 end
 
 M.fn.down_history = function()
+  if vim.fn.pumvisible() == 1 then return end
+
   fn.cmd_history()
   state.idx_hist = state.idx_hist - 1
   local cmd = state.history[state.idx_hist]
