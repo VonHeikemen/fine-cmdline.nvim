@@ -149,7 +149,13 @@ M.fn.close = function()
     fn.feedkeys('<C-e>')
   else
     fn.feedkeys('<Space>')
-    vim.defer_fn(function() M.input.input_props.on_close() end, 3)
+    vim.defer_fn(function()
+      local ok = pcall(M.input.input_props.on_close)
+      if not ok then
+        vim.api.nvim_win_close(0, true)
+        vim.api.nvim_buf_delete(M.input.bufnr, {force = true})
+      end
+    end, 3)
   end
 end
 
