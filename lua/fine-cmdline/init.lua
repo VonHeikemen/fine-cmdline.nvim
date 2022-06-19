@@ -132,6 +132,9 @@ fn.keymaps = function()
   fn.map('<Esc>', M.fn.close)
   fn.map('<C-c>', M.fn.close)
 
+  fn.nmap('<Esc>', M.fn.close)
+  fn.nmap('<C-c>', M.fn.close)
+
   fn.map('<Tab>', M.fn.complete_or_next_item)
   fn.map('<S-Tab>', M.fn.stop_complete_or_previous_item)
 
@@ -360,11 +363,25 @@ fn.merge = function(defaults, override)
   )
 end
 
-fn.map = function(lhs, rhs)
-  if type(rhs) == 'string' then
-    vim.api.nvim_buf_set_keymap(M.input.bufnr, 'i', lhs, rhs, {noremap = true})
-  else
-    M.input:map('i', lhs, rhs, {noremap = true}, true)
+if vim.fn.has('nvim-0.7') == 1 then
+  fn.map = function(lhs, rhs)
+    vim.keymap.set('i', lhs, rhs, {buffer = M.input.bufnr, noremap = true})
+  end
+
+  fn.nmap = function(lhs, rhs)
+    vim.keymap.set('n', lhs, rhs, {buffer = M.input.bufnr, noremap = true})
+  end
+else
+  fn.map = function(lhs, rhs)
+    if type(rhs) == 'string' then
+      vim.api.nvim_buf_set_keymap(M.input.bufnr, 'i', lhs, rhs, {noremap = true})
+    else
+      M.input:map('i', lhs, rhs, {noremap = true}, true)
+    end
+  end
+
+  fn.nmap = function(lhs, rhs)
+    M.input:map('n', lhs, rhs, {noremap = true}, true)
   end
 end
 
