@@ -4,7 +4,7 @@ Here is the plan: A floating input shows up, you a enter a command and you're do
 
 My hope is that someone else with more knowledge sees this and inspires them to make a [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin with the same features.
 
-![A floating input with the text 'Telescope co'. ](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
+![A floating input with the text 'Telescope co'.](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
 
 > Do note `/`, `?` and `%s` will not highlight the matches in realtime as you type. That's [another plugin](https://github.com/VonHeikemen/searchbox.nvim).
 
@@ -143,9 +143,20 @@ require('fine-cmdline').setup({
 
 *before_mount* and *after_mount* receive the instance of the input, so you can do anything with it.
 
-`set_keymaps`. Why is this even in a "hook"? Funny story, you can only bind keys after the input is mounted. And there are other not so funny quirks. So I thought I could make things easier for you.
+`set_keymaps`. Why is this even in a "hook"? Funny story, neovim v0.5 still had bugs and limitations that made things very confusing. This hooks provides helper functions to setup keymaps in a reliable way. If you have neovim v0.7 you can ignore it completely.
 
 ### Setting keymaps
+
+If you have neovim v0.7 you should setup your keybindings in the `after_mount`, using the `vim.keymap.set` function.
+
+```lua
+after_mount = function(input)
+  -- make escape go to normal mode
+  vim.keymap.set('i', '<Esc>', '<cmd>stopinsert<cr>', {buffer = input.bufnr})
+end
+```
+
+If you are using neovim v0.6.1 or lower use the `set_keymaps` hook.
 
 With `set_keymaps` you get two parameters. `imap` makes non-recursive mappings in insert mode. `feedkeys` types keys for you (because of reasons).
 

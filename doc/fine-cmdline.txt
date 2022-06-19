@@ -165,11 +165,24 @@ instance of the input as a parameter.
 
                                               *fine-cmdline.hooks.set_keymaps*
 
-Because each input creates a new buffer you can only bind keys after the input
-is drawn on the screen.
+Gets executed after input is drawn on the screen. Provides helper functions
+that fixes some limitations on older versions of neovim, specifically v0.5 and
+v0.6. If you are using neovim v0.7 you can ignore this hook.
 
 ==============================================================================
 Keymaps                                                 *fine-cmdline-keymaps*
+
+If you have neovim v0.7 you should setup your keybindings in the
+`after_mount`, using the `vim.keymap.set` function.
+
+>
+  after_mount = function(input)
+    -- make escape go to normal mode
+    vim.keymap.set('i', '<Esc>', '<cmd>stopinsert<cr>', {buffer = input.bufnr})
+  end
+<
+
+If you are using neovim v0.6.1 or lower use the `set_keymaps` hook.
 
 With `set_keymaps` you get two parameters. `imap` makes mappings in
 insert mode. `feedkeys` can type keys for you.
