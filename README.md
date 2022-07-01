@@ -101,7 +101,7 @@ If you make a keybinding to call it from visual mode, delete the range first. Li
 :<C-u>FineCmdline<CR>
 ```
 
-If you want to add the selected text range in visual mode use `'<,'>` as the default text.
+If you want to add the range in the input use `'<,'>` as the default value.
 
 ```vim
 :<C-u>FineCmdline '<,'><CR>
