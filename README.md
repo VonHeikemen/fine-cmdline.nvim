@@ -6,7 +6,9 @@ My hope is that someone else with more knowledge sees this and inspires them to 
 
 ![A floating input with the text 'Telescope co'.](https://res.cloudinary.com/vonheikemen/image/upload/v1637341165/other/Captura_de_pantalla_de_2021-11-19_12-54-42.png)
 
-> Do note `/`, `?` and `%s` will not highlight the matches in realtime as you type. That's [another plugin](https://github.com/VonHeikemen/searchbox.nvim).
+> This plugin does not have access to `commandline-mode`, cool features like live previews don't work here.
+>
+> If you want a UI to execute buffer local search (like with `/`) use [searchbox.nvim](https://github.com/VonHeikemen/searchbox.nvim).
 
 ## Getting Started
 
@@ -87,6 +89,22 @@ There is also the possibility to setup a default value before it shows up. Say y
 
 ```lua
 <cmd>lua require("fine-cmdline").open({default_value = ""})<CR>
+```
+
+### Visual mode and ranges
+
+The command `FineCmdline` does not support ranges, it means that if you call it from visual mode with the range `'<,'>` you'll get an error.
+
+If you make a keybinding to call it from visual mode, delete the range first. Like this.
+
+```vim
+:<C-u>FineCmdline<CR>
+```
+
+If you want to add the selected text range in visual mode use `'<,'>` as the default text.
+
+```vim
+:<C-u>FineCmdline '<,'><CR>
 ```
 
 ### Configuration
