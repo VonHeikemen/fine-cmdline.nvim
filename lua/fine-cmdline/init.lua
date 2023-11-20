@@ -98,6 +98,9 @@ fn.submit = function(value)
   local ok, err = pcall(vim.cmd, value)
   if not ok then
     local idx = err:find(':E')
+    if type(idx) ~= 'number' then
+      return
+    end
     local msg = err:sub(idx + 1):gsub('\t', '    ')
     vim.notify(msg, vim.log.levels.ERROR)
   end
