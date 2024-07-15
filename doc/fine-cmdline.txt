@@ -342,3 +342,4 @@ Support                                                *fine-cmdline-donation*
 If you find this tool useful and want to support my efforts, consider
 leaving a tip in https://www.buymeacoffee.com/vonheikemen
 
+vim:tw=78:sw=4:ft=help:norl:
