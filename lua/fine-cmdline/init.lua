@@ -77,7 +77,7 @@ M.open = function(opts)
 
   M.input:mount()
   -- Set custom function for autocompletion
-  vim.bo.omnifunc = 'v:lua._fine_cmdline_omnifunc'
+  vim.bo[M.input.bufnr].omnifunc = 'v:lua._fine_cmdline_omnifunc'
 
   if state.cmdline.enable_keymaps then
     fn.keymaps()
