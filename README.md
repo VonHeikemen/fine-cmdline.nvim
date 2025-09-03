@@ -47,6 +47,17 @@ With `paq`
 'VonHeikemen/fine-cmdline.nvim';
 ```
 
+With `lazy`
+
+```lua
+{
+  'VonHeikemen/fine-cmdline.nvim',
+  dependencies = {
+    { 'MunifTanjim/nui.nvim' }
+  }
+}
+```
+
 ## Usage
 
 The easiest way to use it is calling `FineCmdline`... in a keybinding.
