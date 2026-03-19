@@ -9,7 +9,8 @@ local state = {
   cmdline = {},
   user_opts = {},
   prompt_length = 0,
-  prompt_content = ''
+  prompt_content = '',
+  prev_vim_mode = '',
 }
 
 local defaults = {
@@ -71,6 +72,7 @@ end
 
 M.open = function(opts)
   local ui = M.setup(state.user_opts, opts)
+  state.prev_vim_mode = vim.api.nvim_get_mode().mode
 
   M.input = require('nui.input')(ui.popup, ui.input)
   state.hooks.before_mount(M.input)
@@ -88,6 +90,16 @@ M.open = function(opts)
   end
 
   state.hooks.set_keymaps(fn.map, fn.feedkeys)
+
+  -- Force input into insert mode if current mode is 'terminal mode'
+  if state.prev_vim_mode == 't' then
+    vim.schedule(function()
+      if M.input.bufnr == vim.fn.bufnr() and vim.fn.mode() == 't' then
+        vim.api.nvim_feedkeys('i', 'n', false)
+      end
+    end)
+  end
+
   state.hooks.after_mount(M.input)
 end
 
@@ -418,5 +430,6 @@ end
 -- v:lua doesn't like require'fine-cmdline'.omnifunc
 -- so global variable it is.
 _fine_cmdline_omnifunc = M.omnifunc
+
 return M
 
